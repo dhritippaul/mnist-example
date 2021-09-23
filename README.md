@@ -1,4 +1,4 @@
 # mnist-example  
-![alt text](https://github.com/dhritippaul/mnist-example/blob/feature/plot/modelling.png)
+![alt text](https://github.com/dhritippaul/mnist-example/blob/feature/modelling/modelling.png)
 MLOps handsOn 
 
