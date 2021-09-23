@@ -7,6 +7,7 @@ from sklearn import datasets,svm,metrics
 from sklearn.model_selection import train_test_split
 from joblib import dump,load
 import os
+from utils import preprocessing,create_split
 
 digits = datasets.load_digits()
 
@@ -19,17 +20,17 @@ print("\t\tResize \t\tDataset \t\tgamma_value \t\tAccuracy")
 os.mkdir('models')
 for i in range(len(resize_images_size)):
     resized_images = []
-    
-    for img in digits.images:
-        resized_images.append(transform.rescale(img,resize_images_size[i],anti_aliasing=False))
+    resized_images = np.array(resized_images)
+    test_size = 0.15
+    val_size = 0.15
+    data = resized_images.reshape((n_sample,-1))
+    resized_images = preprocessing(digits.images,resize_images_size[i])
+    train_X,train_Y,test_X,test_Y,val_X,val_Y = create_split(data = data ,target = digits.targets,train_size=0.7,valid_size=0.15,test_size=0.15)
     for j in range(len(hyperparameter_values)):
-        resized_images = np.array(resized_images)
-        data = resized_images.reshape((n_sample,-1))
+        
         model = svm.SVC(gamma = hyperparameter_values[j])
-        test_size = 0.15
-        val_size = 0.15
-        train_X,test_X,train_Y,test_Y = train_test_split(data,digits.target,test_size=0.3,shuffle=False)
-        val_X,test_X,val_Y,test_Y = train_test_split(test_X,test_Y,test_size =0.5,shuffle = False)
+        
+        
         model.fit(train_X,train_Y)
         predict_val = model.predict(val_X)
         acc_val = metrics.accuracy_score(y_pred= predict_val,y_true = val_Y)
