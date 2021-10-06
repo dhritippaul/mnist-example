@@ -10,7 +10,7 @@ import os
 from utils import preprocessing,create_split
 
 digits = datasets.load_digits()
-
+#print(len(digits))
 n_sample = len(digits.images)
 data = digits.images.reshape((n_sample,-1))
 model_candidate = []
@@ -20,17 +20,21 @@ print("\t\tResize \t\tDataset \t\tgamma_value \t\tAccuracy")
 os.mkdir('models')
 for i in range(len(resize_images_size)):
     resized_images = []
+    resized_images = preprocessing(digits.images,resize_images_size[i])
     resized_images = np.array(resized_images)
     test_size = 0.15
     val_size = 0.15
     data = resized_images.reshape((n_sample,-1))
-    resized_images = preprocessing(digits.images,resize_images_size[i])
-    train_X,train_Y,test_X,test_Y,val_X,val_Y = create_split(data = data ,target = digits.targets,train_size=0.7,valid_size=0.15,test_size=0.15)
+    
+    train_X,train_Y,test_X,test_Y,val_X,val_Y = create_split(data = data ,target = digits.target,train_size=0.7,valid_size=0.15,test_size=0.15)
     for j in range(len(hyperparameter_values)):
         
         model = svm.SVC(gamma = hyperparameter_values[j])
         
-        
+        #print(train_X.shape)
+        #print(train_Y.shape)
+        #print(len(train_X))
+        #print(len(train_Y))
         model.fit(train_X,train_Y)
         predict_val = model.predict(val_X)
         acc_val = metrics.accuracy_score(y_pred= predict_val,y_true = val_Y)
@@ -38,7 +42,7 @@ for i in range(len(resize_images_size)):
             print("Skipping for {}".format(hyperparameter_values[j]))
             continue
         candidate = {
-            "acc_valid" : acc_val,
+            "acc" : acc_val,
             "gamma" : hyperparameter_values[j],
         }
         model_candidate.append(candidate)
@@ -46,11 +50,11 @@ for i in range(len(resize_images_size)):
         os.mkdir(output_folder)
         dump(model,os.path.join(output_folder,'model.joblib'))
         print("Saving Model for {}".format(hyperparameter_values[j]))
-    max_valid_acc_model_candidate = max(model_candidate,key=lambda x:x["acc_valid"])
+    max_valid_acc_model_candidate = max(model_candidate,key=lambda x:x["acc"])
     best_model_folder ="./models/tt_{}_val_{}_rescale_{}_gamma_{}".format(test_size,val_size,resize_images_size[i],max_valid_acc_model_candidate["gamma"])
     path = os.path.join(best_model_folder,'model.joblib')
     model = load(path)
     predict_test = model.predict(test_X)
     acc_test = metrics.accuracy_score(y_pred= predict_test,y_true = test_Y)
-    print("\t\t ",resize_images_size[i] ,"\t\tValidation Set","\t\t",hyperparameter_values[j],"\t\t",acc_val*100)
-    print("\t\t ",resize_images_size[i] ,"\t\tTest Set","\t\t",hyperparameter_values[j],"\t\t",acc_test*100)
+    print("\t\t ",resize_images_size[i] ,"\t\tValidation Set","\t\t",max_valid_acc_model_candidate["gamma"],"\t\t",acc_val*100)
+    print("\t\t ",resize_images_size[i] ,"\t\tTest Set","\t\t",max_valid_acc_model_candidate["gamma"],"\t\t",acc_test*100)
