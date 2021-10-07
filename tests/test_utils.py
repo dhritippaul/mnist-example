@@ -1,22 +1,20 @@
-from utils import Experiment_loaded
-from sklearn import datasets
 import random
 import numpy as np
-
-
+from utils import prev_exp
+from sklearn import datasets
 digits = datasets.load_digits()
 
-def test_small_daat_overfitting():
+def exp():
     images = digits.images
-    randomlist = random.sample(range(0,1796),10)
-    data = []
-    Y = []
-    for i in randomlist:
-        data.append(digits.images[i])
-        Y.append(digits.target[i])
-    data = np.array(data)
-    Y = np.array(Y)
-    data = data/255
-    data = data.reshape((10,-1))
-    train_metrics = Experiment_loaded(train_X=data,train_Y=Y,val_X=data,val_Y=Y)
-    assert max(train_metrics) > 0.90
+    req_list = random.sample(range(0,1500),25)
+    values = []
+    L = []
+    values = np.array(values)
+    L = np.array(L)
+    for i in req_list:
+        values.append(digits.images[i])
+        L.append(digits.target[i])
+    values = values/255
+    values = values.reshape((10,-1))
+    exp_data = prev_exp(train_X=values,train_Y=L,val_X=values,val_Y=L)
+    assert max(exp_data) > 0.90
