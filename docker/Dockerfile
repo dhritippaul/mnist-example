@@ -1,8 +1,9 @@
 FROM ubuntu:20.04
+COPY mnist /exp/mnist
 COPY requirements.txt /exp/requirements.txt
-COPY ./mnist/modelling.py /exp/modelling.py
-RUN apt-get update && apt-get install -y python3-pip && apt-get clean
+RUN apt-get clean
+RUN apt-get update && apt-get install -y python3 python3-pip
+RUN pip3 install --upgrade pip
 RUN pip3 install --no-cache-dir -r /exp/requirements.txt
-RUN mkdir /exp/models
-WORKDIR /exp
-CMD ["python3", "./mnist/modelling.py"]
+WORKDIR /exp/mnist/apis
+CMD ["flask","run","--host=0.0.0.0","-p","8000"]

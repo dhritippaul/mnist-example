@@ -17,7 +17,7 @@ model_candidate = []
 resize_images_size = [0.25,0.5,1,2,4,8]
 hyperparameter_values =[0.00001,0.0001,0.001,0.05,1,2,5,10]
 print("\t\tResize \t\tDataset \t\tgamma_value \t\tAccuracy")
-os.mkdir('models')
+#os.mkdir('models')
 for i in range(len(resize_images_size)):
     resized_images = []
     resized_images = preprocessing(digits.images,resize_images_size[i])
@@ -47,13 +47,13 @@ for i in range(len(resize_images_size)):
         }
         model_candidate.append(candidate)
         output_folder = "./models/tt_{}_val_{}_rescale_{}_gamma_{}".format(test_size,val_size,resize_images_size[i],hyperparameter_values[j])
-        os.mkdir(output_folder)
+        #os.mkdir(output_folder)
         dump(model,os.path.join(output_folder,'model.joblib'))
         print("Saving Model for {}".format(hyperparameter_values[j]))
     max_valid_acc_model_candidate = max(model_candidate,key=lambda x:x["acc"])
     best_model_folder ="./models/tt_{}_val_{}_rescale_{}_gamma_{}".format(test_size,val_size,resize_images_size[i],max_valid_acc_model_candidate["gamma"])
     path = os.path.join(best_model_folder,'model.joblib')
-    model = load(path)
+    #model = load(path)
     predict_test = model.predict(test_X)
     acc_test = metrics.accuracy_score(y_pred= predict_test,y_true = test_Y)
     print("\t\t ",resize_images_size[i] ,"\t\tValidation Set","\t\t",max_valid_acc_model_candidate["gamma"],"\t\t",acc_val*100)
